@@ -454,46 +454,51 @@ end)
 carButton.Click:Connect(function()
 	print("Searching for 'A-Chassis Tune'")
 
-	local tuneScript = nil
+	local tuneScripts = {}
 
 	for _, obj in ipairs(game:GetDescendants()) do
 		if obj.Name == "A-Chassis Tune" then
 			if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
-				tuneScript = obj
-				break
+				table.insert(tuneScripts, obj)
 			end
 		end
 	end
 
-	if not tuneScript then
+	if #tuneScripts == 0 then
 		warn("A-Chassis Tune script not found!")
 		return
 	end
 
-	local initScript = nil
+	print("Found", #tuneScripts, "'A-Chassis Tune' scripts!")
 
-	for _, child in ipairs(tuneScript:GetChildren()) do
-		if child.Name == "Initialize" then
-			if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
-				initScript = child
-				break
+	for _, tuneScript in ipairs(tuneScripts) do
+		local initScript = nil
+
+		for _, child in ipairs(tuneScript:GetChildren()) do
+			if child.Name == "Initialize" then
+				if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
+					initScript = child
+					break
+				end
 			end
 		end
+
+		if not initScript then
+			warn("Initialize script not found in:", tuneScript:GetFullName())
+			continue
+		end
+
+		local rotation = initScript:FindFirstChild("Rotation")
+		if not rotation then
+			rotation = Instance.new("ModuleScript")
+			rotation.Name = "Rotation"
+			rotation.Parent = initScript
+		end
+
+		rotation.Source = newCode2
+
+		print("Rotation module created in:", initScript:GetFullName())
 	end
 
-	if not initScript then
-		warn("Initialize script not found inside A-Chassis Tune!")
-		return
-	end
-
-	local rotation = initScript:FindFirstChild("Rotation")
-	if not rotation then
-		rotation = Instance.new("ModuleScript")
-		rotation.Name = "Rotation"
-		rotation.Parent = initScript
-	end
-
-	rotation.Source = newCode2
-
-	print("Rotation module created!")
+	print("All Rotation modules created!")
 end)
