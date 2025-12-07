@@ -452,38 +452,48 @@ weldButton.Click:Connect(function()
 end)
 
 carButton.Click:Connect(function()
-	print("Looking for A-Chassis Tune...")
+	print("Searching for 'A-Chassis Tune' (script types)...")
 
-	local tuneFolder
-	local initFolder
+	local tuneScript = nil
 
 	for _, obj in ipairs(game:GetDescendants()) do
-		if obj.Name == "Tune" and obj:IsA("Folder") then
-			tuneFolder = obj
-			break
+		if obj.Name == "A-Chassis Tune" then
+			if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
+				tuneScript = obj
+				break
+			end
 		end
 	end
 
-	if not tuneFolder then
-		warn("Tune folder not found!")
+	if not tuneScript then
+		warn("A-Chassis Tune script not found!")
 		return
 	end
 
-	initFolder = tuneFolder:FindFirstChild("Initialize")
-	if not initFolder then
-		initFolder = Instance.new("Folder")
-		initFolder.Name = "Initialize"
-		initFolder.Parent = tuneFolder
+	local initScript = nil
+
+	for _, child in ipairs(tuneScript:GetChildren()) do
+		if child.Name == "Initialize" then
+			if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
+				initScript = child
+				break
+			end
+		end
 	end
 
-	local rotationModule = initFolder:FindFirstChild("Rotation")
-	if not rotationModule then
-		rotationModule = Instance.new("ModuleScript")
-		rotationModule.Name = "Rotation"
-		rotationModule.Parent = initFolder
+	if not initScript then
+		warn("Initialize script not found inside A-Chassis Tune!")
+		return
 	end
 
-	rotationModule.Source = newCode2
+	local rotation = initScript:FindFirstChild("Rotation")
+	if not rotation then
+		rotation = Instance.new("ModuleScript")
+		rotation.Name = "Rotation"
+		rotation.Parent = initScript
+	end
 
-	print("Rotation Module created successfully!")
+	rotation.Source = newCode2
+
+	print("✔ Rotation module created/updated inside Initialize!")
 end)
