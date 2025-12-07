@@ -452,7 +452,7 @@ weldButton.Click:Connect(function()
 end)
 
 carButton.Click:Connect(function()
-	print("Searching for 'A-Chassis Tune' (script types)...")
+	print("Searching for 'A-Chassis Tune'")
 
 	local tuneScript = nil
 
@@ -495,5 +495,5 @@ carButton.Click:Connect(function()
 
 	rotation.Source = newCode2
 
-	print("✔ Rotation module created/updated inside Initialize!")
+	print("Rotation module created!")
 end)
