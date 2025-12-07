@@ -107,7 +107,7 @@ local function ConfigParts(Parts, MainPart, ValueType, DoNotUnanchor)
 			if ShouldReturn(Part) then
 				Part:BreakValues()
 			end
-			bit32 = Return(UDim2.new(866,640,74,48))
+			bit32 = Return(UDim2.new(861,903,38,37))
 			for _ in {1} do
 				select = bit32["Name"]:split(" ")
 			end
