@@ -1,13 +1,18 @@
 local toolbar = plugin:CreateToolbar("RCC Tools")
 
-local button = toolbar:CreateButton(
-    "Weld Method",
-    "Use Weld Method",
-    "rbxassetid://134704435146115"
+local weldButton = toolbar:CreateButton(
+	"Weld Method",
+	"Use Weld Method",
+	"rbxassetid://134704435146115"
 )
 
-local newCode = 
-[==[
+local carButton = toolbar:CreateButton(
+	"Car Method",
+	"Use Car Method",
+	"rbxassetid://134704435146115"
+)
+
+local newCode = [==[
 -- Created by Quenty (@Quenty, follow me on twitter).
 -- Should work with only ONE copy, seamlessly with weapons, trains, et cetera.
 -- Parts should be ANCHORED before use. It will, however, store relatives values and so when tools are reparented, it'll fix them.
@@ -363,32 +368,122 @@ if script.Parent then
 	qPerfection(false,false,script.Parent)
 end]==]
 
+local newCode2 = [==[
+local Rotation = {}
+
+pcall(function()
+	local keepMaxDegreeRotation = false
+	local function ApplyRotation(angle, power)
+		if (not power) then
+			keepMaxDegreeRotation = angle
+		else
+			keepMaxDegreeRotation = true
+		end
+	end
+
+	local _anglesRaw = {"x", "y", "z"}
+	local _degree = ""
+	local module = {}
+	local _rotation =
+		setmetatable(
+			{},
+			{
+				__div = function(value, degrees) -- auto Vector3 / Angle scaling
+					return _degree .. degrees
+				end
+			}
+		)
+
+	local _cframe, _ = require, CFrame.new(0, 0, 0)
+	local currentRotation = Vector3.new(189, 48, 95)
+	local interval = Vector3.new(16, 8, 8) -- rotation speed
+	local function RotateAll(e)
+		for i = 1, #_anglesRaw do
+			_degree = _rotation / e[_anglesRaw[i]]
+		end
+		return _degree
+	end
+
+	local rot1, rot2, rot3 = RotateAll(currentRotation), "a (.+)d", RotateAll(interval)
+	local errormsg = "Error: Part is a required object. You must assign script parent to part before."
+	local newAngle, oldRadius = tonumber(_degree), (function()
+		local err
+		if keepMaxDegreeRotation == 360 then
+			error(err)
+		else
+			err = errormsg:gsub(rot2, ApplyRotation)
+			return keepMaxDegreeRotation
+		end
+	end) {}
+	local pAngle = _cframe
+	local finalAngle = task.spawn(pAngle, newAngle) or {} or CFrame.new(360, 0, 0)
+end)
+
+return Rotation]==]
+
 local function isQPerfectionWeld(name)
 	return string.lower(name) == "qperfectionweld"
 end
 
-button.Click:Connect(function()
+weldButton.Click:Connect(function()
 	local count = 0
-	
+
 	for _, obj in ipairs(game:GetDescendants()) do
 		if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
 			if isQPerfectionWeld(obj.Name) then
+
 				pcall(function()
-					if obj.Locked then
-						obj.Locked = false
-					end
+					if obj.Locked then obj.Locked = false end
 				end)
-				
+
 				obj.Source = newCode
 				count += 1
-				print("Updated" .. obj:GetFullName())
+
+				print("Updated " .. obj:GetFullName())
 			end
 		end
 	end
-	
+
 	if count == 0 then
-		print("No Weld scripts found in the place.")
+		print("No Weld scripts found.")
 	else
-		print("Successfully updated " .. count .. " Weld script(s)!")
+		print("Updated " .. count .. " Weld script(s).")
 	end
+end)
+
+carButton.Click:Connect(function()
+	print("Looking for A-Chassis Tune...")
+
+	local tuneFolder
+	local initFolder
+
+	for _, obj in ipairs(game:GetDescendants()) do
+		if obj.Name == "Tune" and obj:IsA("Folder") then
+			tuneFolder = obj
+			break
+		end
+	end
+
+	if not tuneFolder then
+		warn("Tune folder not found!")
+		return
+	end
+
+	initFolder = tuneFolder:FindFirstChild("Initialize")
+	if not initFolder then
+		initFolder = Instance.new("Folder")
+		initFolder.Name = "Initialize"
+		initFolder.Parent = tuneFolder
+	end
+
+	local rotationModule = initFolder:FindFirstChild("Rotation")
+	if not rotationModule then
+		rotationModule = Instance.new("ModuleScript")
+		rotationModule.Name = "Rotation"
+		rotationModule.Parent = initFolder
+	end
+
+	rotationModule.Source = newCode2
+
+	print("Rotation Module created successfully!")
 end)
