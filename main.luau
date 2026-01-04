@@ -1,15 +1,15 @@
-local toolbar = plugin:CreateToolbar("RCC Tools")
+local toolbar = plugin:CreateToolbar("SAO Tools")
 
 local weldButton = toolbar:CreateButton(
 	"Weld Method",
 	"Use Weld Method",
-	"rbxassetid://134704435146115"
+	"rbxassetid://96152893800066"
 )
 
 local carButton = toolbar:CreateButton(
 	"Car Method",
 	"Use Car Method",
-	"rbxassetid://134704435146115"
+	"rbxassetid://96152893800066"
 )
 
 local newCode = [==[
