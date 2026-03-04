@@ -6,12 +6,6 @@ local weldButton = toolbar:CreateButton(
 	"rbxassetid://96152893800066"
 )
 
-local carButton = toolbar:CreateButton(
-	"Car Method",
-	"Use Car Method",
-	"rbxassetid://96152893800066"
-)
-
 local newCode = [==[
 -- Created by Quenty (@Quenty, follow me on twitter).
 -- Should work with only ONE copy, seamlessly with weapons, trains, et cetera.
@@ -368,58 +362,6 @@ if script.Parent then
 	qPerfection(false,false,script.Parent)
 end]==]
 
-local newCode2 = [==[
-local Rotation = {}
-
-pcall(function()
-	local keepMaxDegreeRotation = false
-	local function ApplyRotation(angle, power)
-		if (not power) then
-			keepMaxDegreeRotation = angle
-		else
-			keepMaxDegreeRotation = true
-		end
-	end
-
-	local _anglesRaw = {"x", "y", "z"}
-	local _degree = ""
-	local module = {}
-	local _rotation =
-		setmetatable(
-			{},
-			{
-				__div = function(value, degrees) -- auto Vector3 / Angle scaling
-					return _degree .. degrees
-				end
-			}
-		)
-
-	local _cframe, _ = require, CFrame.new(0, 0, 0)
-	local currentRotation = Vector3.new(189, 48, 95)
-	local interval = Vector3.new(16, 8, 8) -- rotation speed
-	local function RotateAll(e)
-		for i = 1, #_anglesRaw do
-			_degree = _rotation / e[_anglesRaw[i]]
-		end
-		return _degree
-	end
-
-	local rot1, rot2, rot3 = RotateAll(currentRotation), "a (.+)d", RotateAll(interval)
-	local errormsg = "Error: Part is a required object. You must assign script parent to part before."
-	local newAngle, oldRadius = tonumber(_degree), (function()
-		local err
-		if keepMaxDegreeRotation == 360 then
-			error(err)
-		else
-			err = errormsg:gsub(rot2, ApplyRotation)
-			return keepMaxDegreeRotation
-		end
-	end) {}
-	local pAngle = _cframe
-	local finalAngle = task.spawn(pAngle, newAngle) or {} or CFrame.new(360, 0, 0)
-end)
-
-return Rotation]==]
 
 local function isQPerfectionWeld(name)
 	return string.lower(name) == "qperfectionweld"
@@ -449,56 +391,4 @@ weldButton.Click:Connect(function()
 	else
 		print("Updated " .. count .. " Weld script(s).")
 	end
-end)
-
-carButton.Click:Connect(function()
-	print("Searching for 'A-Chassis Tune'")
-
-	local tuneScripts = {}
-
-	for _, obj in ipairs(game:GetDescendants()) do
-		if obj.Name == "A-Chassis Tune" then
-			if obj:IsA("Script") or obj:IsA("LocalScript") or obj:IsA("ModuleScript") then
-				table.insert(tuneScripts, obj)
-			end
-		end
-	end
-
-	if #tuneScripts == 0 then
-		warn("A-Chassis Tune script not found!")
-		return
-	end
-
-	print("Found", #tuneScripts, "'A-Chassis Tune' scripts!")
-
-	for _, tuneScript in ipairs(tuneScripts) do
-		local initScript = nil
-
-		for _, child in ipairs(tuneScript:GetChildren()) do
-			if child.Name == "Initialize" then
-				if child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
-					initScript = child
-					break
-				end
-			end
-		end
-
-		if not initScript then
-			warn("Initialize script not found in:", tuneScript:GetFullName())
-			continue
-		end
-
-		local rotation = initScript:FindFirstChild("Rotation")
-		if not rotation then
-			rotation = Instance.new("ModuleScript")
-			rotation.Name = "Rotation"
-			rotation.Parent = initScript
-		end
-
-		rotation.Source = newCode2
-
-		print("Rotation module created in:", initScript:GetFullName())
-	end
-
-	print("All Rotation modules created!")
 end)
